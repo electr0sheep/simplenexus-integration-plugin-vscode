@@ -25,9 +25,18 @@
         "commands": [
             {
                 "command": "SimpleNexus.beautifyJson",
-                "title": "SimpleNexus - Beautify JSON"
+                "title": "SimpleNexus - Beautify JSON",
+                "icon": "/Users/michaeldegraw/Desktop/SimpleNexus-Integrations-Plugin/simplenexus/images/simplenexus-icon-transparent.png"
             }
-        ]
+        ],
+        "menus": {
+            "touchBar": [
+                {
+                    "command": "SimpleNexus.beautifyJson",
+                    "group": "editing"
+                }
+            ]
+        }
     },
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
