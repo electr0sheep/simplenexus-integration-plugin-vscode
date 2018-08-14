@@ -26,7 +26,7 @@
             {
                 "command": "SimpleNexus.beautifyJson",
                 "title": "SimpleNexus - Beautify JSON",
-                "icon": "/Users/michaeldegraw/Desktop/SimpleNexus-Integrations-Plugin/simplenexus/images/simplenexus-icon-transparent.png"
+                "icon": "./images/simplenexus-icon-transparent.png"
             }
         ],
         "menus": {
