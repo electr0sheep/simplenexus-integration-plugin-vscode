@@ -15,7 +15,7 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.sayHello', function () {
+    let disposable = vscode.commands.registerCommand('SimpleNexus.beautifyJson', function () {
         // The code you place here will be executed every time your command is executed
 
         var jsonFields
@@ -566,43 +566,6 @@ function activate(context) {
         }
 
         // only replace text if the text has changed
-        // function applyEdit(vsEditor, coords, content) {
-        //     var vsDocument = vscode.window.activeTextEditor.document
-        //     // var vsDocument = getDocument(vsEditor);
-        //     // var edit = setEditFactory(vsDocument._uri, coords, content);
-        //     var edit = workspaceEditFactory()
-        //     edit.set(vsDocument.uri, [textEditFactory(null, "test")])
-        //     vscode.workspace.applyEdit(edit);
-        // }
-        // function positionFactory(line, char) {
-        //     return new vscode.Position(line, char);
-        // }
-        // function rangeFactory(start, end) {
-        //     return new vscode.Range(start, end);
-        // }
-        // function textEditFactory(range, content) {
-        //     return new vscode.TextEdit(range, content);
-        // }
-        // function editFactory(coords, content) {
-        //     var start = positionFactory(coords.start.line, coords.start.char);
-        //     var end = positionFactory(coords.end.line, coords.end.char);
-        //     var range = rangeFactory(start, end);
-
-        //     return textEditFactory(range, content);
-        // }
-        // function workspaceEditFactory() {
-        //     return new vscode.WorkspaceEdit();
-        // }
-        // function setEditFactory(uri, coords, content) {
-        //     var workspaceEdit = workspaceEditFactory();
-        //     var edit = editFactory(coords, content);
-
-        //     workspaceEdit.set(uri, [edit]);
-        //     return workspaceEdit;
-        // }
-        // function getDocument(vsEditor) {
-        //     return typeof vsEditor._documentData !== 'undefined' ? vsEditor._documentData : vsEditor._document
-        // }
         if (vscode.window.activeTextEditor.document.getText() !== JSON.stringify(orderedJson, null, 2) + '\n') {
             let edit = new vscode.WorkspaceEdit()
             let firstLine = vscode.window.activeTextEditor.document.lineAt(0);
@@ -613,7 +576,6 @@ function activate(context) {
                 lastLine.range.end.character);
             edit.set(vscode.window.activeTextEditor.document.uri, [new vscode.TextEdit(textRange, JSON.stringify(orderedJson, null, 2))])
             vscode.workspace.applyEdit(edit)
-            // vscode.workspace.applyEdit(JSON.stringify(orderedJson, null, 2))
         }
 
         if (unknownFields) {

@@ -11,14 +11,21 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:SimpleNexus.beautifyJson"
     ],
     "main": "./extension",
     "contributes": {
+        "keybindings": [
+            {
+                "mac": "alt+ctrl+cmd+b",
+                "key": "alt+ctrl+cmd+b",
+                "command": "SimpleNexus.beautifyJson"
+            }
+        ],
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "SimpleNexus.beautifyJson",
+                "title": "SimpleNexus - Beautify JSON"
             }
         ]
     },
