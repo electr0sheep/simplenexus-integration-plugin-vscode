@@ -1,55 +1,72 @@
 {
-    "name": "simplenexus-integration-plugin-vscode",
-    "displayName": "SimpleNexus-Integration-Plugin-VSCode",
-    "description": "Provides JSON beautifying for SimpleNexus loan apps",
-    "version": "0.0.1",
-    "publisher": "electr0sheep",
-    "engines": {
-        "vscode": "^1.26.0"
-    },
-    "categories": [
-        "Other"
+  "name": "simplenexus-integration-plugin-vscode",
+  "displayName": "SimpleNexus-Integration-Plugin-VSCode",
+  "description": "Provides JSON beautifying for SimpleNexus loan apps",
+  "version": "0.0.1",
+  "publisher": "electr0sheep",
+  "author": "electr0sheep",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https: //github.com/electr0sheep/simplenexus-integration-plugin-vscode"
+  },
+  "bugs": {
+    "url": "https: //github.com/electr0sheep/simplenexus-integration-plugin-vscode/issues"
+  },
+  "icon": "simple-nexus.png",
+  "engines": {
+    "vscode": "^1.26.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:SimpleNexus.beautifyJson",
+    "onLanguage:json"
+  ],
+  "main": "./extension",
+  "contributes": {
+    "jsonValidation": [
+      {
+        "fileMatch": "SimpleNexusForms/1003/*.json",
+        "url": "./schemas/loan-app-schema.json"
+      }
     ],
-    "activationEvents": [
-        "onCommand:SimpleNexus.beautifyJson"
+    "keybindings": [
+      {
+        "mac": "alt+ctrl+cmd+b",
+        "key": "alt+ctrl+cmd+b",
+        "command": "SimpleNexus.beautifyJson"
+      }
     ],
-    "main": "./extension",
-    "contributes": {
-        "keybindings": [
-            {
-                "mac": "alt+ctrl+cmd+b",
-                "key": "alt+ctrl+cmd+b",
-                "command": "SimpleNexus.beautifyJson"
-            }
-        ],
-        "commands": [
-            {
-                "command": "SimpleNexus.beautifyJson",
-                "title": "SimpleNexus - Beautify JSON",
-                "icon": "./images/simplenexus-icon-transparent.png"
-            }
-        ],
-        "menus": {
-            "touchBar": [
-                {
-                    "command": "SimpleNexus.beautifyJson",
-                    "group": "editing"
-                }
-            ]
+    "commands": [
+      {
+        "command": "SimpleNexus.beautifyJson",
+        "title": "SimpleNexus - Beautify JSON",
+        "icon": "./images/simplenexus-icon-transparent.png"
+      }
+    ],
+    "menus": {
+      "touchBar": [
+        {
+          "command": "SimpleNexus.beautifyJson",
+          "group": "editing"
         }
-    },
-    "scripts": {
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
-    },
-    "devDependencies": {
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^7.0.43",
-        "eslint": "^4.11.0",
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.18"
-    },
-    "dependencies": {
-        "deep-equal": "^1.0.1"
+      ]
     }
+  },
+  "scripts": {
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^7.0.43",
+    "eslint": "^4.11.0",
+    "typescript": "^2.6.1",
+    "vscode": "^1.1.21"
+  },
+  "dependencies": {
+    "deep-equal": "^1.0.1"
+  }
 }

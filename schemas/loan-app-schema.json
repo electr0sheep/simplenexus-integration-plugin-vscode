@@ -1,0 +1,502 @@
+{
+  "$id": "https://assets.simplenexus.com/schemas/loan-app-schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Loan Application",
+  "description": "Defines the format and flow of a loan application",
+  "definitions": {
+    "phase": {
+      "type": "array",
+      "title": "Phase",
+      "description": "Defines a phase in a loan app.",
+      "items": { "$ref": "#/definitions/page" }
+    },
+    "page": {
+      "type": "object",
+      "title": "Page",
+      "description": "Defines a page in a loan app. This includes a title for the page, input fields, and conditional rendering requirements",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "title": "Fields",
+          "description": "A list of input field keys. Each key is further defined under the \"fields\" root property",
+          "items": {
+            "$ref": "./placeholders.json#/definitions/placeholders"
+          },
+          "minItems": 1
+        },
+        "instructions": {
+          "type": "string",
+          "title": "Instructions",
+          "description": "The title to be displayed on the page"
+        },
+        "condition": {
+          "title": "Condition",
+          "description": "The key of a previous field which controls whether this section renders",
+          "$ref": "./placeholders.json#/definitions/placeholders"
+        },
+        "conditionValue": {
+          "type": "string",
+          "title": "Condition Value",
+          "description": "The condition key must equal this value in order for this section to be active"
+        },
+        "roles": {
+          "type": "array",
+          "title": "Roles",
+          "description": "A list of the roles that are able to view this section",
+          "items": {
+            "type": "string",
+            "enum": ["borrower", "servicer"],
+            "title": "Role",
+            "description": "The type of individual viewing the loan application"
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "step": {
+          "type": "string",
+          "title": "The display name of this page in the stepper",
+          "description": "Groups steps with the same name, as long as they are contiguous"
+        }
+      },
+      "required": ["fields", "instructions"],
+      "additionalProperties": false
+    },
+    "inputField": {
+      "type": "object",
+      "title": "Input Field",
+      "description": "Describes the type of input field and any special conditions it may have",
+      "properties": {
+        "key": {
+          "$ref": "./placeholders.json#/definitions/placeholders"
+        },
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "description": "The label for the input field"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Additional information about the field. Note: only renders if it is different from the \"title\" field"
+        },
+        "type": {
+          "type": "string",
+          "title": "Type",
+          "description": "The type of input field to be displayed"
+        },
+        "required": {
+          "type": "boolean",
+          "title": "Required?",
+          "description": "Whether the input field is required to progress to the next page",
+          "default": false
+        }
+      },
+      "required": ["key", "type"]
+    },
+    "textInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["text"]
+            },
+            "placeholder": {
+              "$ref": "#/definitions/placeholder"
+            }
+          }
+        }
+      ]
+    },
+    "infoField": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["info"]
+            },
+            "text": {
+              "type": "string",
+              "title": "Text",
+              "description": "The information to be displayed"
+            }
+          }
+        }
+      ]
+    },
+    "numberInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["currency", "integer"]
+            },
+            "min": {
+              "type": "integer",
+              "title": "Min",
+              "description": "The smallest accepted integer value",
+              "default": 0
+            },
+            "max": {
+              "type": "integer",
+              "title": "Max",
+              "description": "The largest accepted integer value",
+              "default": 0
+            }
+          }
+        }
+      ]
+    },
+    "dateInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["date"]
+            },
+            "min": {
+              "title": "Min",
+              "description": "The earliest acceptable date. Accepts either a year number or a string in the format of YYYY-MM-DD (hyphens included)",
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "default": 0
+                },
+                {
+                  "type": "string",
+                  "default": "YYYY-MM-DD"
+                }
+              ]
+            },
+            "max": {
+              "title": "Max",
+              "description": "The latest acceptable date. Accepts either a year number or a string in the format of YYYY-MM-DD (hyphens included)",
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "default": 0
+                },
+                {
+                  "type": "string",
+                  "default": "YYYY-MM-DD"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "agreementInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["agreement"]
+            },
+            "text": {
+              "$ref": "#/definitions/text"
+            }
+          }
+        }
+      ]
+    },
+    "selectionInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["multi_choice", "single_choice"]
+            },
+            "choices": {
+              "type": "array",
+              "title": "Choices",
+              "description": "A list of options for a select field",
+              "items": {
+                "type": "string",
+                "title": "Choice",
+                "description": "A select field option"
+              },
+              "minItems": 2
+            },
+            "showTextInput": {
+              "type": "string",
+              "title": "Show Text Input",
+              "description": "The choice value for which to show an additional text input"
+            },
+            "otherRequiredWhenSelected": {
+              "type": "boolean",
+              "title": "Other Required When Selected?",
+              "description": "Whether or not the \"other\" field is required to progress to the next page"
+            }
+          },
+          "required": ["choices"],
+          "dependencies": {
+            "otherRequiredWhenSelected": ["showTextInput"]
+          }
+        }
+      ]
+    },
+    "singleChoiceInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/selectionInput"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["single_choice"]
+            },
+            "selectionType": {
+              "type": "string",
+              "enum": ["radio", "dropdown"],
+              "title": "Selection Type",
+              "description": "The type of single choice component to render"
+            }
+          }
+        }
+      ]
+    },
+    "multiChoiceInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/selectionInput"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["multi_choice"]
+            }
+          }
+        }
+      ]
+    },
+    "booleanInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["boolean"]
+            },
+            "text": {
+              "$ref": "#/definitions/text"
+            }
+          }
+        }
+      ]
+    },
+    "stateInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["state"]
+            },
+            "allowAllStates": {
+              "type": "boolean",
+              "title": "Allow All States",
+              "description": "Should all states be shown in the dropdown. If \"false\", it will only show the LO's licensed states",
+              "default": true
+            }
+          }
+        }
+      ]
+    },
+    "otherInput": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/inputField"
+        },
+        {
+          "properties": {
+            "type": {
+              "enum": ["zip", "email", "ssn", "phone"]
+            }
+          }
+        }
+      ]
+    },
+    "text": {
+      "type": "string",
+      "title": "Agreement Text",
+      "description": "The body of the agreement"
+    },
+    "placeholder": {
+      "type": "string",
+      "title": "Placeholder",
+      "description": "Specifies a prompt that appears in the text area when empty"
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "description": "The name of the loan app"
+    },
+    "structure": {
+      "type": "array",
+      "title": "Structure",
+      "description": "A list of pages included in the loan application",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/page"
+          },
+          {
+            "$ref": "#/definitions/phase"
+          }
+        ]
+      }
+    },
+    "values": {
+      "type": "object",
+      "title": "Values",
+      "description": "Stores filled out field values"
+    },
+    "fields": {
+      "type": "array",
+      "title": "Input Fields",
+      "description": "A list of definitions for the input fields defined on each page within the \"structure\" section",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/textInput"
+          },
+          {
+            "$ref": "#/definitions/numberInput"
+          },
+          {
+            "$ref": "#/definitions/dateInput"
+          },
+          {
+            "$ref": "#/definitions/infoField"
+          },
+          {
+            "$ref": "#/definitions/agreementInput"
+          },
+          {
+            "$ref": "#/definitions/singleChoiceInput"
+          },
+          {
+            "$ref": "#/definitions/multiChoiceInput"
+          },
+          {
+            "$ref": "#/definitions/booleanInput"
+          },
+          {
+            "$ref": "#/definitions/stateInput"
+          },
+          {
+            "$ref": "#/definitions/otherInput"
+          }
+        ]
+      },
+      "minItems": 1
+    },
+    "initially_skip_fields": {
+      "type": "array",
+      "title": "Initially Skip Fields",
+      "description": "A list of field keys to skip. If all fields in a section are in this list, the section will be skipped when it is being filled out. Note: to assign these fields a default value, the key-value pair must be added to the root \"values\" property",
+      "items": {
+        "type": "string",
+        "title": "Field",
+        "description": "The key of a field that should be skipped initially"
+      }
+    },
+    "validations": {
+      "type": "array",
+      "title": "Validations",
+      "description": "A list of custom section validations",
+      "items": {
+        "type": "object",
+        "title": "Validation",
+        "description": "A custom validation to run on a section",
+        "oneOf": [
+          {
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["address"],
+                "title": "Validation Type",
+                "description": "The type of validation to run on the section"
+              },
+              "key": {
+                "type": "string",
+                "title": "Validation Key",
+                "description": "The key of the field on which to run the validation"
+              },
+              "fields": {
+                "type": "object",
+                "title": "Validation Fields",
+                "description": "A mapping of field keys to validator parameters",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "title": "Address Field",
+                    "description": "The key of the street address field being validated"
+                  },
+                  "city": {
+                    "type": "string",
+                    "title": "City Field",
+                    "description": "The key of the city field being validated"
+                  },
+                  "state": {
+                    "type": "string",
+                    "title": "State Field",
+                    "description": "The key of the state field being validated"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "title": "Zip Field",
+                    "description": "The key of the zip field being validated"
+                  }
+                },
+                "required": ["address", "city", "state", "zip"]
+              }
+            },
+            "required": ["type", "key", "fields"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "currentSection": {
+      "type": "integer",
+      "minimum": 0,
+      "title": "Current Section",
+      "description": "The currently visible section of the loan app"
+    },
+    "version": {
+      "type": "string",
+      "title": "Version",
+      "description": "The schema version this loan application uses",
+      "default": "1.0"
+    }
+  },
+  "required": ["name", "structure", "fields", "version"],
+  "additionalProperties": false
+}
