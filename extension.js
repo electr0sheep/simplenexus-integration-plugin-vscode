@@ -146,9 +146,6 @@ function activate(context) {
         );
         return;
       }
-      if (nmm) {
-        vscode.window.showInformationMessage("🐵🍌🌰NMM Activated!🌰🍌🐵");
-      }
 
       // I use JSON.parse(JSON.stringify(obj)) here to deep copy the objects
       var cleanedJson = {
@@ -261,7 +258,7 @@ function activate(context) {
                     vscode.window.showErrorMessage(
                       "NMM couldn't find '" +
                         parsedJson.structure[i].fields[i2] +
-                        "' please create a new issue: https://github.com/electr0sheep/SimpleNexus-Integrations-Plugin/issues/new"
+                        "' please create a new issue: https://github.com/electr0sheep/simplenexus-integration-plugin-vscode/issues/new"
                     );
                   }
                 } else {
@@ -364,7 +361,7 @@ function activate(context) {
                       vscode.window.showErrorMessage(
                         "NMM couldn't find '" +
                           parsedJson.structure[i][i2].fields[i3] +
-                          "' please create a new issue: https://github.com/electr0sheep/SimpleNexus-Integrations-Plugin/issues/new"
+                          "' please create a new issue: https://github.com/electr0sheep/simplenexus-integration-plugin-vscode/issues/new"
                       );
                     }
                   } else {
