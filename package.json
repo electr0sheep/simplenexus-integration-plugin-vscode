@@ -2,7 +2,7 @@
   "name": "simplenexus-integration-plugin-vscode",
   "displayName": "SimpleNexus-Integration-Plugin-VSCode",
   "description": "Provides JSON beautifying for SimpleNexus loan apps",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "publisher": "electr0sheep",
   "author": "electr0sheep",
   "private": true,
