@@ -9,7 +9,8 @@
       "type": "array",
       "title": "Phase",
       "description": "Defines a phase in a loan app.",
-      "items": { "$ref": "#/definitions/page" }
+      "items": { "$ref": "#/definitions/page" },
+      "minItems": 1
     },
     "page": {
       "type": "object",
@@ -61,6 +62,20 @@
         }
       },
       "required": ["fields", "instructions"],
+      "defaultSnippets": [
+        {
+          "label": "Page",
+          "description": "Add a new page",
+          "body": {
+            "fields": [],
+            "instructions": "$1",
+            "condition": "$2",
+            "conditionValue": "$3",
+            "roles": ["${4|borrower,servicer|}"],
+            "step": "$5"
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "inputField": {
@@ -93,7 +108,161 @@
           "default": false
         }
       },
-      "required": ["key", "type"]
+      "defaultSnippets": [
+        {
+          "label": "Text",
+          "description": "Allows any text input",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "text",
+            "required": "^${4|false,true|}"
+          }
+        },
+        {
+          "label": "Info",
+          "description": "Displays information",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "info",
+            "required": "false"
+          }
+        },
+        {
+          "label": "Currency",
+          "description": "Allows USD input",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "currency",
+            "min": "$4",
+            "max": "$5",
+            "required": "^${6|false,true|}"
+          }
+        },
+        {
+          "label": "Integer",
+          "description": "Allows number input",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "integer",
+            "min": "$4",
+            "max": "$5",
+            "required": "^${6|false,true|}"
+          }
+        },
+        {
+          "label": "Date",
+          "description": "Allows date input",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "date",
+            "min": "$4",
+            "max": "$5",
+            "required": "^${6|false,true|}"
+          }
+        },
+        {
+          "label": "Agreement",
+          "description": "Displays checkbox",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "agreement",
+            "required": "^${4|false,true|}"
+          }
+        },
+        {
+          "label": "Single Choice",
+          "description": "Displays radio buttons or a dropdown list, from which the user can select a single element",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "single_choice",
+            "choices": ["$4", "$5", "$6"],
+            "required": "^${7|false,true|}"
+          }
+        },
+        {
+          "label": "Multi Choice",
+          "description": "Displays radio buttons or a dropdown list, from which the user can select any combination of elements",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "multi_choice",
+            "choices": ["$4", "$5", "$6"],
+            "required": "^${7|false,true|}"
+          }
+        },
+        {
+          "label": "Boolean",
+          "description": "Yes/No",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "boolean",
+            "required": "^${4|false,true|}"
+          }
+        },
+        {
+          "label": "State",
+          "description": "Allows selection of states",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "state",
+            "allowAllStates": "^${4|false,true|}",
+            "required": "^${5|false,true|}"
+          }
+        },
+        {
+          "label": "Zip",
+          "description": "Allows input of a zipcode",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "zip",
+            "required": "^${5|false,true|}"
+          }
+        },
+        {
+          "label": "SSN",
+          "description": "Allows input of a Social Security Number",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "ssn",
+            "required": "^${5|false,true|}"
+          }
+        },
+        {
+          "label": "Phone",
+          "description": "Allows input of a phone number",
+          "body": {
+            "key": "$1",
+            "title": "$2",
+            "description": "$3",
+            "type": "phone",
+            "required": "^${5|false,true|}"
+          }
+        }
+      ],
+      "required": ["key", "title", "type"]
     },
     "textInput": {
       "allOf": [
@@ -370,7 +539,8 @@
             "$ref": "#/definitions/phase"
           }
         ]
-      }
+      },
+      "minItems": 1
     },
     "values": {
       "type": "object",
@@ -497,6 +667,36 @@
       "default": "1.0"
     }
   },
+  "defaultSnippets": [
+    {
+      "label": "Single Phase",
+      "description": "A single phase loan app",
+      "body": {
+        "name": "$1",
+        "structure": [],
+        "values": {},
+        "fields": [],
+        "initially_skip_fields": [],
+        "validations": [],
+        "currentSection": "^$2",
+        "version": "$3"
+      }
+    },
+    {
+      "label": "Multi Phase",
+      "description": "A multi phase loan app",
+      "body": {
+        "name": "$1",
+        "structure": [[]],
+        "values": {},
+        "fields": [],
+        "initially_skip_fields": [],
+        "validations": [],
+        "currentSection": "^$2",
+        "version": "$3"
+      }
+    }
+  ],
   "required": ["name", "structure", "fields", "version"],
   "additionalProperties": false
 }

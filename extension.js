@@ -7,13 +7,13 @@ const fs = require("fs");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
-  var jsonDocument = JSON.parse(
-    vscode.window.activeTextEditor.document.getText()
-  );
   vscode.languages.registerHoverProvider(
     { language: "json", scheme: "" },
     {
       provideHover(document, position, token) {
+        let jsonDocument = JSON.parse(
+          vscode.window.activeTextEditor.document.getText()
+        );
         let key = document.getText(document.getWordRangeAtPosition(position));
         jsonDocument.fields.ea;
         for (let field in jsonDocument.fields) {
@@ -61,11 +61,12 @@ function activate(context) {
 
       var jsonFields;
       try {
-        // var jsonFields = fs.readFileSync(atom.packages.getPackageDirPaths()[0] + '/SimpleNexus-Integrations-Plugin/simplenexus/default_json_fields.json')
         jsonFields = JSON.parse(
           fs
             .readFileSync(
-              "/Users/michaeldegraw/Desktop/SimpleNexus-Integrations-Plugin/simplenexus/default_json_fields.json"
+              vscode.extensions.getExtension(
+                "electr0sheep.simplenexus-integration-plugin-vscode"
+              ).extensionPath + "/default_json_fields.json"
             )
             .toString()
         );
