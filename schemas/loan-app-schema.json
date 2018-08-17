@@ -74,6 +74,41 @@
             "roles": ["${4|borrower,servicer|}"],
             "step": "$5"
           }
+        },
+        {
+          "label": "d1003 Page",
+          "description": "Add a new d1003 page",
+          "body": {
+            "fields": [],
+            "instructions": "$1",
+            "roles": ["${2|borrower,servicer|}"],
+            "step": "$3",
+            "computed": {
+              "condition": {
+                "$4__${5|in,gt,gte,lt,lte,contains,not,present,input|}": "$6",
+                "or": {
+                  "$7__${8|in,gt,gte,lt,lte,contains,not,present,input|}": "$9"
+                }
+              },
+              "set": [
+                {
+                  "condition": {
+                    "$10__${11|in,gt,gte,lt,lte,contains,not,present,input|}": "$12"
+                  },
+                  "values": {
+                    "$13": "$13__${14|in,gt,gte,lt,lte,contains,not,present,input|}",
+                    "$13": "$15"
+                  }
+                }
+              ],
+              "required": {
+                "$16__${17|in,gt,gte,lt,lte,contains,not,present,input|}": "$17",
+                "or": {
+                  "$18__${19|in,gt,gte,lt,lte,contains,not,present,input|}": "$20"
+                }
+              }
+            }
+          }
         }
       ],
       "additionalProperties": false
@@ -703,6 +738,6 @@
       }
     }
   ],
-  "required": ["name", "structure", "fields", "version"],
+  "required": ["name", "structure", "fields"],
   "additionalProperties": false
 }

@@ -744,6 +744,10 @@ function activate(context) {
               organizedField.indentations =
                 cleanedJson[field][values].indentations;
             }
+            if (cleanedJson[field][values].computed != undefined) {
+              organizedField.computed =
+                cleanedJson[field][values].computed;
+            }
             if (cleanedJson[field][values].required != undefined) {
               organizedField.required = cleanedJson[field][values].required;
             }
