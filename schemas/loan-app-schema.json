@@ -202,7 +202,8 @@
             "description": "$3",
             "type": "multi_choice",
             "choices": ["$4", "$5", "$6"],
-            "required": "^${7|false,true|}"
+            "indentations": ["^$7", "^$8", "^$9"],
+            "required": "^${10|false,true|}"
           }
         },
         {
@@ -453,6 +454,11 @@
           "properties": {
             "type": {
               "enum": ["multi_choice"]
+            },
+            "indentations": {
+              "type": "array",
+              "title": "Provides indentation",
+              "description": "Indents options as they occur in \"options\""
             }
           }
         }

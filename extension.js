@@ -4,6 +4,8 @@ const vscode = require("vscode");
 const deepEqual = require("deep-equal");
 const fs = require("fs");
 
+var jsonFields;
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -51,6 +53,22 @@ function activate(context) {
   //     }
   //   });
 
+  try {
+    jsonFields = JSON.parse(
+      fs
+        .readFileSync(
+          vscode.extensions.getExtension(
+            "electr0sheep.simplenexus-integration-plugin-vscode"
+          ).extensionPath + "/default_json_fields.json"
+        )
+        .toString()
+    );
+  } catch (err) {
+    vscode.window.showErrorMessage("Unable to open default_json_fields.json");
+    vscode.window.showErrorMessage(err.toString());
+    return;
+  }
+
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
@@ -58,25 +76,6 @@ function activate(context) {
     "SimpleNexus.beautifyJson",
     function() {
       // The code you place here will be executed every time your command is executed
-
-      var jsonFields;
-      try {
-        jsonFields = JSON.parse(
-          fs
-            .readFileSync(
-              vscode.extensions.getExtension(
-                "electr0sheep.simplenexus-integration-plugin-vscode"
-              ).extensionPath + "/default_json_fields.json"
-            )
-            .toString()
-        );
-      } catch (err) {
-        vscode.window.showErrorMessage(
-          "Unable to open default_json_fields.json"
-        );
-        vscode.window.showErrorMessage(err.toString());
-        return;
-      }
 
       let nmm = true;
       // check for JSON extension

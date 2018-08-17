@@ -489,6 +489,10 @@
         "is_veteran",
         "job_title",
         "joint_credit",
+        "keep_property",
+        "landlord_email",
+        "landlord_name",
+        "landlord_phone",
         "last_name",
         "lead_source",
         "legal_name_borrower",
@@ -7747,6 +7751,33 @@
       "key": "joint_credit",
       "title": "Jointly applying for credit",
       "type": "boolean",
+      "required": false
+    },
+    {
+      "key": "keep_property",
+      "title": "Keep your home?",
+      "type": "boolean",
+      "required": true
+    },
+    {
+      "key": "landlord_email",
+      "title": "Email Address",
+      "description": "Landlord Email Address",
+      "type": "phone",
+      "required": false
+    },
+    {
+      "key": "landlord_name",
+      "title": "Name",
+      "description": "Landlord Name",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "landlord_phone",
+      "title": "Phone Number",
+      "description": "Landlord Phone Number",
+      "type": "phone",
       "required": false
     },
     {
