@@ -7,6 +7,30 @@ const fs = require("fs");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
+  var jsonDocument = JSON.parse(
+    vscode.window.activeTextEditor.document.getText()
+  );
+  vscode.languages.registerHoverProvider(
+    { language: "json", scheme: "" },
+    {
+      provideHover(document, position, token) {
+        let key = document.getText(document.getWordRangeAtPosition(position));
+        jsonDocument.fields.ea;
+        for (let field in jsonDocument.fields) {
+          let currentField = jsonDocument.fields[field];
+          if ('"' + currentField.key + '"' == key) {
+            return new vscode.Hover(
+              JSON.stringify(currentField, null, 2)
+                .replace(/\n/g, "\r  ")
+                .replace("{", "")
+                .replace("}", "")
+                .replace(/,/g, "")
+            );
+          }
+        }
+      }
+    }
+  );
   //   vscode.languages.registerCompletionItemProvider("json", {
   //     provideCompletionItems: function(document, position, token, context) {
   //       console.log(document);
@@ -26,12 +50,6 @@ function activate(context) {
   //       return [item];
   //     }
   //   });
-
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log(
-    'Congratulations, your extension "simplenexus-integration-plugin-vscode" is now active!'
-  );
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
