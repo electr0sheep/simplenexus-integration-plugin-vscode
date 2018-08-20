@@ -57,8 +57,51 @@
         },
         "step": {
           "type": "string",
-          "title": "The display name of this page in the stepper",
+          "title": "Step",
           "description": "Groups steps with the same name, as long as they are contiguous"
+        },
+        "validations": {
+          "type": "array",
+          "title": "Validations",
+          "description": "Provides validation for certain fields",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "title": "Type",
+                "description": "Only validation we support for now is USPS address validation",
+                "default": "address"
+              },
+              "key": {
+                "type": "string",
+                "title": "Key",
+                "description": "The key that this validation falls under. THIS NEEDS TO BE UNIQUE.",
+                "default": "borrowerAddress"
+              },
+              "fields": {
+                "type": "object",
+                "title": "Fields",
+                "description": "The fields that this validation will validate",
+              }
+            }
+          },
+          "defaultSnippets": [
+            {
+              "label": "Address Validation",
+              "description": "Provides address validation through USPS",
+              "body": {
+                "type": "address",
+                "key": "$1",
+                "fields": {
+                  "address": "$2",
+                  "city": "$3",
+                  "state": "$4",
+                  "zip": "$5"
+                }
+              }
+            }
+          ]
         }
       },
       "required": ["fields", "instructions"],
@@ -73,41 +116,6 @@
             "conditionValue": "$3",
             "roles": ["${4|borrower,servicer|}"],
             "step": "$5"
-          }
-        },
-        {
-          "label": "d1003 Page",
-          "description": "Add a new d1003 page",
-          "body": {
-            "fields": [],
-            "instructions": "$1",
-            "roles": ["${2|borrower,servicer|}"],
-            "step": "$3",
-            "computed": {
-              "condition": {
-                "$4__${5|in,gt,gte,lt,lte,contains,not,present,input|}": "$6",
-                "or": {
-                  "$7__${8|in,gt,gte,lt,lte,contains,not,present,input|}": "$9"
-                }
-              },
-              "set": [
-                {
-                  "condition": {
-                    "$10__${11|in,gt,gte,lt,lte,contains,not,present,input|}": "$12"
-                  },
-                  "values": {
-                    "$13": "$13__${14|in,gt,gte,lt,lte,contains,not,present,input|}",
-                    "$13": "$15"
-                  }
-                }
-              ],
-              "required": {
-                "$16__${17|in,gt,gte,lt,lte,contains,not,present,input|}": "$17",
-                "or": {
-                  "$18__${19|in,gt,gte,lt,lte,contains,not,present,input|}": "$20"
-                }
-              }
-            }
           }
         }
       ],
@@ -135,6 +143,66 @@
           "type": "string",
           "title": "Type",
           "description": "The type of input field to be displayed"
+        },
+        "computed": {
+          "type": "object",
+          "title": "Computed",
+          "description": "d1003 logic",
+          "properties": {
+            "condition": {
+              "title": "Condition",
+              "description": "Determine if the field should be visible on a page",
+              "type": "object",
+              "properties": {
+                "or": {
+                  "title": "Or",
+                  "description": "FILL_ME_IN",
+                  "type": "object",
+                  "defaultSnippets": [
+                    {
+                      "label": "Or",
+                      "description": "Don't know",
+                      "body": {
+                        "$1__${2|in,gt,gte,lt,lte,contains,not,present,input|}": "$3"
+                      }
+                    }
+                  ]
+                }
+              },
+              "defaultSnippets": [
+                {
+                  "label": "Condition",
+                  "description": "Allows any text input",
+                  "body": {"$1__${2|in,gt,gte,lt,lte,contains,not,present,input|}": "$3"}
+                }
+              ]
+            },
+            "set": {
+              "title": "Set",
+              "description": "Sets default values",
+              "properties": {
+                "condition": {
+                  "title": "Condition",
+                  "description": "",
+                  "type": "object"
+                },
+                "values": {
+                  "title": "Values",
+                  "description": "",
+                  "type": "object"
+                }
+              }
+            },
+            "required": {
+              "title": "Required",
+              "description": "Will set a field as required if certain conditions are met",
+              "properties": {
+                "or": {
+                  "type": "object"
+                }
+              }
+            }
+          }
         },
         "required": {
           "type": "boolean",
