@@ -83,6 +83,28 @@
                 "type": "object",
                 "title": "Fields",
                 "description": "The fields that this validation will validate",
+                "properties": {
+                  "address": {
+                    "title": "",
+                    "description": "",
+                    "$ref": "./placeholders.json#/definitions/placeholders"
+                  },
+                  "city": {
+                    "title": "",
+                    "description": "",
+                    "$ref": "./placeholders.json#/definitions/placeholders"
+                  },
+                  "state": {
+                    "title": "",
+                    "description": "",
+                    "$ref": "./placeholders.json#/definitions/placeholders"
+                  },
+                  "zip": {
+                    "title": "",
+                    "description": "",
+                    "$ref": "./placeholders.json#/definitions/placeholders"
+                  }
+                }
               }
             }
           },
@@ -90,16 +112,18 @@
             {
               "label": "Address Validation",
               "description": "Provides address validation through USPS",
-              "body": {
-                "type": "address",
-                "key": "$1",
-                "fields": {
-                  "address": "$2",
-                  "city": "$3",
-                  "state": "$4",
-                  "zip": "$5"
+              "body": [
+                {
+                  "type": "address",
+                  "key": "$1",
+                  "fields": {
+                    "address": "^$2",
+                    "city": "^$3",
+                    "state": "^$4",
+                    "zip": "^$5"
+                  }
                 }
-              }
+              ]
             }
           ]
         }
