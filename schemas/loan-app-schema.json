@@ -168,7 +168,7 @@
           "title": "Type",
           "description": "The type of input field to be displayed"
         },
-        "disabled": {
+        "editable": {
           "type": "boolean",
           "title": "Disabled",
           "description": "Marks whether or not the field can be changed"
