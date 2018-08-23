@@ -3,8 +3,12 @@
 const vscode = require("vscode");
 const deepEqual = require("deep-equal");
 const fs = require("fs");
+const github = require("github-api");
 
 var jsonFields;
+var gh = new github({
+  token: "91f0371340a7fd2072a120768a3a82f6d4014e5f"
+}).getIssues("electr0sheep", "simplenexus-integration-plugin-vscode");
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -39,7 +43,7 @@ function activate(context) {
   //       console.log(position);
   //       console.log(token);
   //       console.log(context);
-  //       var item = new vscode.CompletionItem(
+  //       let item = new vscode.CompletionItem(
   //         "Good part of the day",
   //         vscode.CompletionItemKind.Snippet
   //       );
@@ -75,6 +79,7 @@ function activate(context) {
   let disposable = vscode.commands.registerCommand(
     "SimpleNexus.beautifyJson",
     function() {
+      let newIssues = [];
       // The code you place here will be executed every time your command is executed
 
       let nmm = true;
@@ -103,7 +108,7 @@ function activate(context) {
         return;
       }
       // verify that the JSON object is SimpleNexus JSON, first by checking for unknown fields
-      for (var property in parsedJson) {
+      for (let property in parsedJson) {
         if (
           property != "name" &&
           property != "structure" &&
@@ -166,29 +171,29 @@ function activate(context) {
       }
 
       // I use JSON.parse(JSON.stringify(obj)) here to deep copy the objects
-      var cleanedJson = {
+      let cleanedJson = {
         name: JSON.parse(JSON.stringify(parsedJson.name)),
         structure: JSON.parse(JSON.stringify(parsedJson.structure)),
         values: JSON.parse(JSON.stringify(parsedJson.values)),
         fields: [],
         version: JSON.parse(JSON.stringify(parsedJson.version))
       };
-      var unusedFields = JSON.parse(JSON.stringify(parsedJson.fields));
-      var partialDuplicateFields = [];
-      var cleanedFieldsIndex = 0;
-      var nmmAddedFields = 0;
+      let unusedFields = JSON.parse(JSON.stringify(parsedJson.fields));
+      let partialDuplicateFields = [];
+      let cleanedFieldsIndex = 0;
+      let nmmAddedFields = 0;
 
       // first, clean duplicate fields out of unusedFields until no duplicates are found
 
       // oddly enough, cleaning duplicates turned out to be non-trivial.
 
-      for (var i = 0; i < unusedFields.length; i++) {
+      for (let i = 0; i < unusedFields.length; i++) {
         // check entry against partialDuplicateFields first
-        for (var i2 = 0; i2 < partialDuplicateFields.length; i2++) {
+        for (let i2 = 0; i2 < partialDuplicateFields.length; i2++) {
           if (unusedFields[i].key == partialDuplicateFields[i2].key) {
             // make sure there isn't an exact match in partialDuplicateFields already
             let partialDuplicateExactMatch = false;
-            for (var i3 = i2; i3 < partialDuplicateFields.length; i3++) {
+            for (let i3 = i2; i3 < partialDuplicateFields.length; i3++) {
               if (
                 deepEqual(unusedFields[i], partialDuplicateFields.length[i3])
               ) {
@@ -210,7 +215,7 @@ function activate(context) {
         }
 
         // then check entry against other fields in unusedFields
-        for (var i2 = i + 1; i2 < unusedFields.length; i2++) {
+        for (let i2 = i + 1; i2 < unusedFields.length; i2++) {
           if (unusedFields[i].key == unusedFields[i2].key) {
             if (!deepEqual(unusedFields[i], unusedFields[i2])) {
               partialDuplicateFields.push(
@@ -235,15 +240,15 @@ function activate(context) {
         parsedJson.structure[0][0] === undefined
       ) {
         // loop through the structure...
-        for (var i = 0; i < parsedJson.structure.length; i++) {
+        for (let i = 0; i < parsedJson.structure.length; i++) {
           // and fields...
           if (parsedJson.structure[i].fields) {
-            for (var i2 = 0; i2 < parsedJson.structure[i].fields.length; i2++) {
-              var fieldExists = false;
-              var duplicate = false;
+            for (let i2 = 0; i2 < parsedJson.structure[i].fields.length; i2++) {
+              let fieldExists = false;
+              let duplicate = false;
 
               // make sure each field in structure has a matching field in fields
-              for (var i3 = 0; i3 < parsedJson.fields.length; i3++) {
+              for (let i3 = 0; i3 < parsedJson.fields.length; i3++) {
                 if (
                   parsedJson.structure[i].fields[i2] ==
                   parsedJson.fields[i3].key
@@ -257,8 +262,8 @@ function activate(context) {
                 // check for nmm
                 if (nmm) {
                   // add the field
-                  var nmmHasField;
-                  for (var i3 = 0; i3 < jsonFields.fields.length; i3++) {
+                  let nmmHasField;
+                  for (let i3 = 0; i3 < jsonFields.fields.length; i3++) {
                     nmmHasField = false;
                     if (
                       jsonFields.fields[i3].key ==
@@ -273,11 +278,60 @@ function activate(context) {
                     }
                   }
                   if (nmmHasField === false) {
-                    vscode.window.showErrorMessage(
-                      "NMM couldn't find '" +
-                        parsedJson.structure[i].fields[i2] +
-                        "' please create a new issue: https://github.com/electr0sheep/simplenexus-integration-plugin-vscode/issues/new"
-                    );
+                    let field = parsedJson.structure[i].fields[i2];
+                    if (newIssues.indexOf(field) === -1) {
+                      newIssues.push(field);
+                      gh.listIssues().then(function({ data }) {
+                        console.log(data);
+                        let issueAlreadyExists = false;
+                        for (let index in data) {
+                          var issue = data[index];
+                          if (issue.title == field) {
+                            issueAlreadyExists = true;
+                            break;
+                          }
+                        }
+                        if (issueAlreadyExists === false) {
+                          gh.createIssue({
+                            title: field,
+                            body: "No details could be automatically pulled",
+                            labels: ["new SimpleNexus field"]
+                          }).then(function() {
+                            vscode.window.showErrorMessage(
+                              "Created a new issue for " + field
+                            );
+                          });
+                        } else {
+                          // lets see if we can add data
+                          let definition = JSON.stringify(
+                            parsedJson.fields.find(item => {
+                              return item.key == field;
+                            }),
+                            null,
+                            2
+                          );
+                          console.log(issue.body);
+                          console.log(definition);
+                          if (
+                            issue.body ===
+                              "No details could be automatically pulled" &&
+                            definition !== undefined
+                          ) {
+                            gh.editIssue(issue.number, {
+                              title: issue.title,
+                              body: definition,
+                              labels: ["new SimpleNexus field"]
+                            });
+                          } else {
+                            vscode.window.showErrorMessage(
+                              "Issue already exists for " +
+                                field +
+                                " please bug Michael to add it"
+                            );
+                          }
+                        }
+                      });
+                    }
                   }
                 } else {
                   vscode.window.showWarningMessage(
@@ -287,8 +341,84 @@ function activate(context) {
                   );
                 }
               } else {
+                // make sure NMM has field, and if it doesn't lets create an issue so we can easily add it
+                let nmmHasField;
+                for (let i3 = 0; i3 < jsonFields.fields.length; i3++) {
+                  nmmHasField = false;
+                  if (
+                    jsonFields.fields[i3].key ==
+                    parsedJson.structure[i].fields[i2]
+                  ) {
+                    nmmHasField = true;
+                    break;
+                  }
+                }
+                if (nmmHasField === false) {
+                  let field = parsedJson.structure[i].fields[i2];
+                  let definition = JSON.stringify(
+                    parsedJson.fields.find(item => {
+                      return item.key == field;
+                    }),
+                    null,
+                    2
+                  );
+                  if (newIssues.indexOf(field) === -1) {
+                    newIssues.push(field);
+                    gh.listIssues().then(function({ data }) {
+                      let issueAlreadyExists = false;
+                      for (let index in data) {
+                        var issue = data[index];
+                        if (issue.title == field) {
+                          issueAlreadyExists = true;
+                          break;
+                        }
+                      }
+                      if (issueAlreadyExists === false) {
+                        gh.createIssue({
+                          title: field,
+                          body: "```json\n" + definition + "\n```",
+                          labels: ["new SimpleNexus field"]
+                        }).then(function() {
+                          vscode.window.showErrorMessage(
+                            "Created a new issue for " + field
+                          );
+                        });
+                      } else {
+                        // lets see if we can add data
+                        let definition = JSON.stringify(
+                          parsedJson.fields.find(item => {
+                            return item.key == field;
+                          }),
+                          null,
+                          2
+                        );
+                        if (
+                          issue.body ===
+                            "No details could be automatically pulled" &&
+                          definition !== undefined
+                        ) {
+                          gh.editIssue(issue.number, {
+                            title: issue.title,
+                            body: "```json\n" + definition + "\n```",
+                            labels: ["new SimpleNexus field"]
+                          });
+                          vscode.window.showErrorMessage(
+                            "Added field definition for " + field
+                          );
+                        } else {
+                          vscode.window.showErrorMessage(
+                            "Issue already exists for " +
+                              field +
+                              " please bug Michael to add it"
+                          );
+                        }
+                      }
+                    });
+                  }
+                }
+
                 // look for duplicates in existing fields
-                for (var i3 = 0; i3 < cleanedJson.fields.length; i3++) {
+                for (let i3 = 0; i3 < cleanedJson.fields.length; i3++) {
                   if (
                     cleanedJson.fields[i3].key ==
                     parsedJson.structure[i].fields[i2]
@@ -299,9 +429,9 @@ function activate(context) {
                 }
 
                 if (duplicate === false) {
-                  var index = -1;
+                  let index = -1;
                   // find index in pre-formatted JSON structure
-                  for (var i3 = 0; i3 < parsedJson.fields.length; i3++) {
+                  for (let i3 = 0; i3 < parsedJson.fields.length; i3++) {
                     if (
                       parsedJson.fields[i3].key ==
                       parsedJson.structure[i].fields[i2]
@@ -316,7 +446,7 @@ function activate(context) {
                     parsedJson.fields[index];
 
                   // finally, remove the field from unusedFields
-                  for (var i3 = 0; i3 < unusedFields.length; i3++) {
+                  for (let i3 = 0; i3 < unusedFields.length; i3++) {
                     if (
                       unusedFields[i3].key == parsedJson.structure[i].fields[i2]
                     ) {
@@ -333,20 +463,20 @@ function activate(context) {
       // Multi-Phase
       else if (parsedJson.structure[0][0] !== undefined) {
         // loop through the structures...
-        for (var i = 0; i < parsedJson.structure.length; i++) {
-          for (var i2 = 0; i2 < parsedJson.structure[i].length; i2++) {
+        for (let i = 0; i < parsedJson.structure.length; i++) {
+          for (let i2 = 0; i2 < parsedJson.structure[i].length; i2++) {
             // and fields...
             if (parsedJson.structure[i][i2].fields) {
               for (
-                var i3 = 0;
+                let i3 = 0;
                 i3 < parsedJson.structure[i][i2].fields.length;
                 i3++
               ) {
-                var fieldExists = false;
-                var duplicate = false;
+                let fieldExists = false;
+                let duplicate = false;
 
                 // make sure each field in structure has a matching field in fields
-                for (var i4 = 0; i4 < parsedJson.fields.length; i4++) {
+                for (let i4 = 0; i4 < parsedJson.fields.length; i4++) {
                   if (
                     parsedJson.structure[i][i2].fields[i3] ==
                     parsedJson.fields[i4].key
@@ -360,8 +490,8 @@ function activate(context) {
                   // check for nmm
                   if (nmm) {
                     // add the field
-                    var nmmHasField;
-                    for (var i4 = 0; i4 < jsonFields.fields.length; i4++) {
+                    let nmmHasField;
+                    for (let i4 = 0; i4 < jsonFields.fields.length; i4++) {
                       nmmHasField = false;
                       if (
                         jsonFields.fields[i4].key ==
@@ -391,23 +521,20 @@ function activate(context) {
                   }
                 } else {
                   // look for duplicates in existing fields
-                  for (var i4 = 0; i4 < cleanedJson.fields.length; i4++) {
+                  for (let i4 = 0; i4 < cleanedJson.fields.length; i4++) {
                     if (
                       cleanedJson.fields[i4].key ==
                       parsedJson.structure[i][i2].fields[i3]
                     ) {
-                      var copyOfCleanedJson = JSON.parse(
-                        JSON.stringify(cleanedJson)
-                      );
                       duplicate = true;
                       break;
                     }
                   }
 
                   if (duplicate === false) {
-                    var index = -1;
+                    let index = -1;
                     // find index in pre-formatted JSON structure
-                    for (var i4 = 0; i4 < parsedJson.fields.length; i4++) {
+                    for (let i4 = 0; i4 < parsedJson.fields.length; i4++) {
                       if (
                         parsedJson.fields[i4].key ==
                         parsedJson.structure[i][i2].fields[i3]
@@ -422,7 +549,7 @@ function activate(context) {
                       parsedJson.fields[index];
 
                     // finally, remove the field from unusedFields
-                    for (var i4 = 0; i4 < unusedFields.length; i4++) {
+                    for (let i4 = 0; i4 < unusedFields.length; i4++) {
                       if (
                         unusedFields[i4].key ==
                         parsedJson.structure[i][i2].fields[i3]
@@ -446,17 +573,17 @@ function activate(context) {
       }
 
       // Do SimpleNexus specific checks
-      var has_errors = false;
+      let has_errors = false;
 
       // Check the structure
       if (
         cleanedJson.structure[0] !== undefined &&
         cleanedJson.structure[0][0] === undefined
       ) {
-        for (var i = 0; i < cleanedJson.structure.length; i++) {
+        for (let i = 0; i < cleanedJson.structure.length; i++) {
           let page = cleanedJson.structure[i];
           if (page.condition !== undefined) {
-            for (var i2 = 0; i2 < page.fields.length; i2++) {
+            for (let i2 = 0; i2 < page.fields.length; i2++) {
               let field = page.fields[i2];
               if (field == page.condition) {
                 vscode.window.showErrorMessage(
@@ -470,12 +597,12 @@ function activate(context) {
           }
         }
       } else if (cleanedJson.structure[0][0] !== undefined) {
-        for (var i = 0; i < cleanedJson.structure.length; i++) {
+        for (let i = 0; i < cleanedJson.structure.length; i++) {
           let phase = cleanedJson.structure[i];
-          for (var i2 = 0; i2 < phase.length; i2++) {
+          for (let i2 = 0; i2 < phase.length; i2++) {
             let page = phase[i2];
             if (page.condition !== undefined) {
-              for (var i3 = 0; i3 < page.fields.length; i3++) {
+              for (let i3 = 0; i3 < page.fields.length; i3++) {
                 let field = page.fields[i3];
                 if (field == page.condition) {
                   vscode.window.showErrorMessage(
@@ -491,7 +618,7 @@ function activate(context) {
         }
       }
 
-      for (var i = 0; i < cleanedJson.fields.length; i++) {
+      for (let i = 0; i < cleanedJson.fields.length; i++) {
         let currentField = cleanedJson.fields[i];
 
         // ERRORS
@@ -536,7 +663,7 @@ function activate(context) {
         }
 
         // check for blank fields
-        for (var key in currentField) {
+        for (let key in currentField) {
           if (currentField[key] === "") {
             delete currentField[key];
           }
@@ -681,8 +808,8 @@ function activate(context) {
       vscode.window.showInformationMessage("SimpleNexus JSON Beautified!");
 
       // Organize "fields" fields
-      var orderedJson = {};
-      var unknownFields = false;
+      let orderedJson = {};
+      let unknownFields = false;
 
       for (let field in cleanedJson) {
         if (field == "fields") {
@@ -744,9 +871,11 @@ function activate(context) {
               organizedField.indentations =
                 cleanedJson[field][values].indentations;
             }
+            if (cleanedJson[field][values].disabled != undefined) {
+              organizedField.disabled = cleanedJson[field][values].disabled;
+            }
             if (cleanedJson[field][values].computed != undefined) {
-              organizedField.computed =
-                cleanedJson[field][values].computed;
+              organizedField.computed = cleanedJson[field][values].computed;
             }
             if (cleanedJson[field][values].required != undefined) {
               organizedField.required = cleanedJson[field][values].required;

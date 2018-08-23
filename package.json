@@ -67,6 +67,7 @@
     "vscode": "^1.1.21"
   },
   "dependencies": {
-    "deep-equal": "^1.0.1"
+    "deep-equal": "^1.0.1",
+    "github-api": "^3.0.0"
   }
 }

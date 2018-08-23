@@ -168,26 +168,42 @@
           "title": "Type",
           "description": "The type of input field to be displayed"
         },
+        "disabled": {
+          "type": "boolean",
+          "title": "Disabled",
+          "description": "Marks whether or not the field can be changed"
+        },
         "computed": {
           "type": "object",
           "title": "Computed",
-          "description": "d1003 logic",
+          "description": "d1003 logic. Example syntax: \"property_years__gt\": 2, if property years is greater than 2",
           "properties": {
             "condition": {
               "title": "Condition",
               "description": "Determine if the field should be visible on a page",
               "type": "object",
+              "items": {
+                "defaultSnippets": [
+                  {
+                    "label": "condition",
+                    "description": "Add new condition",
+                    "body": {
+                      "$1__${2|in,gt,gte,lt,lte,contains,not,present,input|}": "^$3"
+                    }
+                  }
+                ]
+              },
               "properties": {
                 "or": {
                   "title": "Or",
-                  "description": "FILL_ME_IN",
+                  "description": "Provides an alternate set of conditions that could result in the field being displayed",
                   "type": "object",
                   "defaultSnippets": [
                     {
                       "label": "Or",
-                      "description": "Don't know",
+                      "description": "Provides an alternate set of conditions that could result in the field being displayed",
                       "body": {
-                        "$1__${2|in,gt,gte,lt,lte,contains,not,present,input|}": "$3"
+                        "$1__${2|in,gt,gte,lt,lte,contains,not,present,input|}": "^$3"
                       }
                     }
                   ]
@@ -196,14 +212,26 @@
               "defaultSnippets": [
                 {
                   "label": "Condition",
-                  "description": "Allows any text input",
-                  "body": {"$1__${2|in,gt,gte,lt,lte,contains,not,present,input|}": "$3"}
+                  "description": "Determines if the field should be displayd",
+                  "body": {
+                    "$1__${2|in,gt,gte,lt,lte,contains,not,present,input|}": "^$3"
+                  }
+                },
+                {
+                  "label": "Condition with or",
+                  "description": "Determines if the field should be displayd, includes an or block",
+                  "body": {
+                    "$1__${2|in,gt,gte,lt,lte,contains,not,present,input|}": "^$3",
+                    "or": {
+                      "$4__${5|in,gt,gte,lt,lte,contains,not,present,input|}": "^$6"
+                    }
+                  }
                 }
               ]
             },
             "set": {
               "title": "Set",
-              "description": "Sets default values",
+              "description": "Sets the value of the field",
               "properties": {
                 "condition": {
                   "title": "Condition",
