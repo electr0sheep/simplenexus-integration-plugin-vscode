@@ -282,7 +282,6 @@ function activate(context) {
                     if (newIssues.indexOf(field) === -1) {
                       newIssues.push(field);
                       gh.listIssues().then(function({ data }) {
-                        console.log(data);
                         let issueAlreadyExists = false;
                         for (let index in data) {
                           var issue = data[index];
@@ -310,8 +309,6 @@ function activate(context) {
                             null,
                             2
                           );
-                          console.log(issue.body);
-                          console.log(definition);
                           if (
                             issue.body ===
                               "No details could be automatically pulled" &&
@@ -506,11 +503,57 @@ function activate(context) {
                       }
                     }
                     if (nmmHasField === false) {
-                      vscode.window.showErrorMessage(
-                        "NMM couldn't find '" +
-                          parsedJson.structure[i][i2].fields[i3] +
-                          "' please create a new issue: https://github.com/electr0sheep/simplenexus-integration-plugin-vscode/issues/new"
-                      );
+                      let field = parsedJson.structure[i][i2].fields[i3];
+                      if (newIssues.indexOf(field) === -1) {
+                        newIssues.push(field);
+                        gh.listIssues().then(function({ data }) {
+                          let issueAlreadyExists = false;
+                          for (let index in data) {
+                            var issue = data[index];
+                            if (issue.title == field) {
+                              issueAlreadyExists = true;
+                              break;
+                            }
+                          }
+                          if (issueAlreadyExists === false) {
+                            gh.createIssue({
+                              title: field,
+                              body: "No details could be automatically pulled",
+                              labels: ["new SimpleNexus field"]
+                            }).then(function() {
+                              vscode.window.showErrorMessage(
+                                "Created a new issue for " + field
+                              );
+                            });
+                          } else {
+                            // lets see if we can add data
+                            let definition = JSON.stringify(
+                              parsedJson.fields.find(item => {
+                                return item.key == field;
+                              }),
+                              null,
+                              2
+                            );
+                            if (
+                              issue.body ===
+                                "No details could be automatically pulled" &&
+                              definition !== undefined
+                            ) {
+                              gh.editIssue(issue.number, {
+                                title: issue.title,
+                                body: definition,
+                                labels: ["new SimpleNexus field"]
+                              });
+                            } else {
+                              vscode.window.showErrorMessage(
+                                "Issue already exists for " +
+                                  field +
+                                  " please bug Michael to add it"
+                              );
+                            }
+                          }
+                        });
+                      }
                     }
                   } else {
                     vscode.window.showWarningMessage(
@@ -520,6 +563,81 @@ function activate(context) {
                     );
                   }
                 } else {
+                  // make sure NMM has field, and if it doesn't lets create an issue so we can easily add it
+                  let nmmHasField;
+                  for (let i4 = 0; i4 < jsonFields.fields.length; i4++) {
+                    nmmHasField = false;
+                    if (
+                      jsonFields.fields[i4].key ==
+                      parsedJson.structure[i][i2].fields[i3]
+                    ) {
+                      nmmHasField = true;
+                      break;
+                    }
+                  }
+                  if (nmmHasField === false) {
+                    let field = parsedJson.structure[i][i2].fields[i3];
+                    let definition = JSON.stringify(
+                      parsedJson.fields.find(item => {
+                        return item.key == field;
+                      }),
+                      null,
+                      2
+                    );
+                    if (newIssues.indexOf(field) === -1) {
+                      newIssues.push(field);
+                      gh.listIssues().then(function({ data }) {
+                        let issueAlreadyExists = false;
+                        for (let index in data) {
+                          var issue = data[index];
+                          if (issue.title == field) {
+                            issueAlreadyExists = true;
+                            break;
+                          }
+                        }
+                        if (issueAlreadyExists === false) {
+                          gh.createIssue({
+                            title: field,
+                            body: "```json\n" + definition + "\n```",
+                            labels: ["new SimpleNexus field"]
+                          }).then(function() {
+                            vscode.window.showErrorMessage(
+                              "Created a new issue for " + field
+                            );
+                          });
+                        } else {
+                          // lets see if we can add data
+                          let definition = JSON.stringify(
+                            parsedJson.fields.find(item => {
+                              return item.key == field;
+                            }),
+                            null,
+                            2
+                          );
+                          if (
+                            issue.body ===
+                              "No details could be automatically pulled" &&
+                            definition !== undefined
+                          ) {
+                            gh.editIssue(issue.number, {
+                              title: issue.title,
+                              body: "```json\n" + definition + "\n```",
+                              labels: ["new SimpleNexus field"]
+                            });
+                            vscode.window.showErrorMessage(
+                              "Added field definition for " + field
+                            );
+                          } else {
+                            vscode.window.showErrorMessage(
+                              "Issue already exists for " +
+                                field +
+                                " please bug Michael to add it"
+                            );
+                          }
+                        }
+                      });
+                    }
+                  }
                   // look for duplicates in existing fields
                   for (let i4 = 0; i4 < cleanedJson.fields.length; i4++) {
                     if (
@@ -867,12 +985,19 @@ function activate(context) {
             if (cleanedJson[field][values].choices != undefined) {
               organizedField.choices = cleanedJson[field][values].choices;
             }
+            if (cleanedJson[field][values].selectionType != undefined) {
+              organizedField.selectionType =
+                cleanedJson[field][values].selectionType;
+            }
             if (cleanedJson[field][values].indentations != undefined) {
               organizedField.indentations =
                 cleanedJson[field][values].indentations;
             }
             if (cleanedJson[field][values].disabled != undefined) {
               organizedField.disabled = cleanedJson[field][values].disabled;
+            }
+            if (cleanedJson[field][values].editable != undefined) {
+              organizedField.editable = cleanedJson[field][values].editable;
             }
             if (cleanedJson[field][values].computed != undefined) {
               organizedField.computed = cleanedJson[field][values].computed;
