@@ -17,6 +17,12 @@ function activate(context) {
     { language: "json", scheme: "" },
     {
       provideHover(document, position, token) {
+        // shows how to make use of fancy markdown with commands
+        // let message = new vscode.MarkdownString(
+        //   '[`What is this?`](command:SimpleNexus.beautifyJson "hover text")<button>test</button>'
+        // );
+        // message.isTrusted = true;
+        // return new vscode.Hover(message);
         let jsonDocument = JSON.parse(
           vscode.window.activeTextEditor.document.getText()
         );
@@ -34,6 +40,18 @@ function activate(context) {
             );
           }
         }
+      }
+    }
+  );
+  vscode.languages.registerDefinitionProvider(
+    { language: "json", scheme: "" },
+    {
+      provideDefinition(document, position, token) {
+        let field = document.getText(document.getWordRangeAtPosition(position));
+        let location = document.positionAt(
+          document.getText().indexOf('"key": ' + field)
+        );
+        return new vscode.Location(document.uri, location);
       }
     }
   );
