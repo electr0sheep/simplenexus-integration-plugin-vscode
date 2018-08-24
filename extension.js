@@ -14,7 +14,7 @@ var gh = new github({
 // your extension is activated the very first time the command is executed
 function activate(context) {
   vscode.languages.registerHoverProvider(
-    { language: "json", scheme: "" },
+    { language: "json", pattern: "**/SimpleNexusForms/1003/*.json" },
     {
       provideHover(document, position, token) {
         // shows how to make use of fancy markdown with commands
@@ -44,7 +44,7 @@ function activate(context) {
     }
   );
   vscode.languages.registerDefinitionProvider(
-    { language: "json", scheme: "" },
+    { language: "json", pattern: "**/SimpleNexusForms/1003/*.json" },
     {
       provideDefinition(document, position, token) {
         let field = document.getText(document.getWordRangeAtPosition(position));
