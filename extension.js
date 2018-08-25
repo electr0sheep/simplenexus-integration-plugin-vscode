@@ -27,18 +27,24 @@ function activate(context) {
           vscode.window.activeTextEditor.document.getText()
         );
         let key = document.getText(document.getWordRangeAtPosition(position));
-        jsonDocument.fields.ea;
-        for (let field in jsonDocument.fields) {
-          let currentField = jsonDocument.fields[field];
-          if ('"' + currentField.key + '"' == key) {
-            return new vscode.Hover(
-              JSON.stringify(currentField, null, 2)
-                .replace(/\n/g, "\r  ")
-                .replace("{", "")
-                .replace("}", "")
-                .replace(/,/g, "")
-            );
+        if (key[0] === '"' && key[key.length - 1] == '"') {
+          for (let field in jsonDocument.fields) {
+            let currentField = jsonDocument.fields[field];
+            if ('"' + currentField.key + '"' == key) {
+              let popupText = new vscode.MarkdownString(
+                "---\r```\r" + JSON.stringify(currentField, null, 2) + "\r```"
+              );
+              return new vscode.Hover(popupText);
+            }
           }
+          // let table =
+          //   "| Tables        | Are             | Cool  |\r" +
+          //   "|---------------|:---------------:|------:|\r" +
+          //   "| col 3 is      | right - aligned | $1600 |\r" +
+          //   "| col 2 is      | centered        | $12   |\r" +
+          //   "| zebra stripes | are neat        | $1    |";
+          let mdstring = new vscode.MarkdownString("> test");
+          return new vscode.Hover(mdstring);
         }
       }
     }
