@@ -37,13 +37,7 @@ function activate(context) {
               return new vscode.Hover(popupText);
             }
           }
-          // let table =
-          //   "| Tables        | Are             | Cool  |\r" +
-          //   "|---------------|:---------------:|------:|\r" +
-          //   "| col 3 is      | right - aligned | $1600 |\r" +
-          //   "| col 2 is      | centered        | $12   |\r" +
-          //   "| zebra stripes | are neat        | $1    |";
-          let mdstring = new vscode.MarkdownString("> test");
+          let mdstring = new vscode.MarkdownString("Field has no definition!");
           return new vscode.Hover(mdstring);
         }
       }
@@ -103,6 +97,19 @@ function activate(context) {
   let disposable = vscode.commands.registerCommand(
     "SimpleNexus.beautifyJson",
     function() {
+      let box = vscode.window.createInputBox();
+      box.prompt = "prompt";
+      box.placeholder = "placeholder";
+      box.step = 1;
+      box.title = "title";
+      box.totalSteps = 2;
+      box.value = "this\nis\ra\n\rtest\r\nyo";
+      // box.buttons = [vscode.QuickInputButtons.Back];
+      box.show();
+      // vscode.window.showInputBox({
+      //   prompt: "Test",
+      //   value: "this\ris\na\n\rtest"
+      // });
       let newIssues = [];
       // The code you place here will be executed every time your command is executed
 
