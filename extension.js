@@ -20,7 +20,7 @@ function activate(context) {
   //     }
   //   }
   // })
-  vscode.commands.executeCommand('workbench.action.terminal.split')
+  vscode.commands.executeCommand('workbench.action.terminal.splitInActiveWorkspace')
   vscode.languages.registerHoverProvider({
     language: "json",
     pattern: "**/SimpleNexusForms/1003/*.json"

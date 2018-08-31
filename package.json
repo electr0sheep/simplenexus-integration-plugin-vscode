@@ -61,9 +61,9 @@
   },
   "devDependencies": {
     "@types/mocha": "^2.2.42",
-    "@types/node": "^7.0.43",
+    "@types/node": "^7.0.70",
     "eslint": "^4.11.0",
-    "typescript": "^2.6.1",
+    "typescript": "^2.9.2",
     "vscode": "^1.1.21"
   },
   "dependencies": {
