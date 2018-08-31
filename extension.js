@@ -13,48 +13,56 @@ var gh = new github({
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
-  vscode.languages.registerHoverProvider(
-    { language: "json", pattern: "**/SimpleNexusForms/1003/*.json" },
-    {
-      provideHover(document, position, token) {
-        // shows how to make use of fancy markdown with commands
-        // let message = new vscode.MarkdownString(
-        //   '[`What is this?`](command:SimpleNexus.beautifyJson "hover text")<button>test</button>'
-        // );
-        // message.isTrusted = true;
-        // return new vscode.Hover(message);
-        let jsonDocument = JSON.parse(
-          vscode.window.activeTextEditor.document.getText()
-        );
-        let key = document.getText(document.getWordRangeAtPosition(position));
-        if (key[0] === '"' && key[key.length - 1] == '"') {
-          for (let field in jsonDocument.fields) {
-            let currentField = jsonDocument.fields[field];
-            if ('"' + currentField.key + '"' == key) {
-              let popupText = new vscode.MarkdownString(
-                "---\r```\r" + JSON.stringify(currentField, null, 2) + "\r```"
-              );
-              return new vscode.Hover(popupText);
-            }
+  // vscode.commands.getCommands().then(function (data) {
+  //   for (let i in data) {
+  //     if (data[i].includes('terminal')) {
+  //       console.log(data[i])
+  //     }
+  //   }
+  // })
+  vscode.commands.executeCommand('workbench.action.terminal.split')
+  vscode.languages.registerHoverProvider({
+    language: "json",
+    pattern: "**/SimpleNexusForms/1003/*.json"
+  }, {
+    provideHover(document, position, token) {
+      // shows how to make use of fancy markdown with commands
+      // let message = new vscode.MarkdownString(
+      //   '[`What is this?`](command:SimpleNexus.beautifyJson "hover text")<button>test</button>'
+      // );
+      // message.isTrusted = true;
+      // return new vscode.Hover(message);
+      let jsonDocument = JSON.parse(
+        vscode.window.activeTextEditor.document.getText()
+      );
+      let key = document.getText(document.getWordRangeAtPosition(position));
+      if (key[0] === '"' && key[key.length - 1] == '"') {
+        for (let field in jsonDocument.fields) {
+          let currentField = jsonDocument.fields[field];
+          if ('"' + currentField.key + '"' == key) {
+            let popupText = new vscode.MarkdownString(
+              "---\r```\r" + JSON.stringify(currentField, null, 2) + "\r```"
+            );
+            return new vscode.Hover(popupText);
           }
-          let mdstring = new vscode.MarkdownString("Field has no definition!");
-          return new vscode.Hover(mdstring);
         }
+        let mdstring = new vscode.MarkdownString("Field has no definition!");
+        return new vscode.Hover(mdstring);
       }
     }
-  );
-  vscode.languages.registerDefinitionProvider(
-    { language: "json", pattern: "**/SimpleNexusForms/1003/*.json" },
-    {
-      provideDefinition(document, position, token) {
-        let field = document.getText(document.getWordRangeAtPosition(position));
-        let location = document.positionAt(
-          document.getText().indexOf('"key": ' + field)
-        );
-        return new vscode.Location(document.uri, location);
-      }
+  });
+  vscode.languages.registerDefinitionProvider({
+    language: "json",
+    pattern: "**/SimpleNexusForms/1003/*.json"
+  }, {
+    provideDefinition(document, position, token) {
+      let field = document.getText(document.getWordRangeAtPosition(position));
+      let location = document.positionAt(
+        document.getText().indexOf('"key": ' + field)
+      );
+      return new vscode.Location(document.uri, location);
     }
-  );
+  });
   //   vscode.languages.registerCompletionItemProvider("json", {
   //     provideCompletionItems: function(document, position, token, context) {
   //       console.log(document);
@@ -78,12 +86,12 @@ function activate(context) {
   try {
     jsonFields = JSON.parse(
       fs
-        .readFileSync(
-          vscode.extensions.getExtension(
-            "electr0sheep.simplenexus-integration-plugin-vscode"
-          ).extensionPath + "/default_json_fields.json"
-        )
-        .toString()
+      .readFileSync(
+        vscode.extensions.getExtension(
+          "electr0sheep.simplenexus-integration-plugin-vscode"
+        ).extensionPath + "/default_json_fields.json"
+      )
+      .toString()
     );
   } catch (err) {
     vscode.window.showErrorMessage("Unable to open default_json_fields.json");
@@ -96,7 +104,7 @@ function activate(context) {
   // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand(
     "SimpleNexus.beautifyJson",
-    function() {
+    function () {
       let box = vscode.window.createInputBox();
       box.prompt = "prompt";
       box.placeholder = "placeholder";
@@ -312,7 +320,9 @@ function activate(context) {
                     let field = parsedJson.structure[i].fields[i2];
                     if (newIssues.indexOf(field) === -1) {
                       newIssues.push(field);
-                      gh.listIssues().then(function({ data }) {
+                      gh.listIssues().then(function ({
+                        data
+                      }) {
                         let issueAlreadyExists = false;
                         for (let index in data) {
                           var issue = data[index];
@@ -326,7 +336,7 @@ function activate(context) {
                             title: field,
                             body: "No details could be automatically pulled",
                             labels: ["new SimpleNexus field"]
-                          }).then(function() {
+                          }).then(function () {
                             vscode.window.showErrorMessage(
                               "Created a new issue for " + field
                             );
@@ -342,7 +352,7 @@ function activate(context) {
                           );
                           if (
                             issue.body ===
-                              "No details could be automatically pulled" &&
+                            "No details could be automatically pulled" &&
                             definition !== undefined
                           ) {
                             gh.editIssue(issue.number, {
@@ -353,8 +363,8 @@ function activate(context) {
                           } else {
                             vscode.window.showErrorMessage(
                               "Issue already exists for " +
-                                field +
-                                " please bug Michael to add it"
+                              field +
+                              " please bug Michael to add it"
                             );
                           }
                         }
@@ -364,8 +374,8 @@ function activate(context) {
                 } else {
                   vscode.window.showWarningMessage(
                     "Field '" +
-                      parsedJson.structure[i].fields[i2] +
-                      "' exists in structure, but not in fields"
+                    parsedJson.structure[i].fields[i2] +
+                    "' exists in structure, but not in fields"
                   );
                 }
               } else {
@@ -392,7 +402,9 @@ function activate(context) {
                   );
                   if (newIssues.indexOf(field) === -1) {
                     newIssues.push(field);
-                    gh.listIssues().then(function({ data }) {
+                    gh.listIssues().then(function ({
+                      data
+                    }) {
                       let issueAlreadyExists = false;
                       for (let index in data) {
                         var issue = data[index];
@@ -406,7 +418,7 @@ function activate(context) {
                           title: field,
                           body: "```json\n" + definition + "\n```",
                           labels: ["new SimpleNexus field"]
-                        }).then(function() {
+                        }).then(function () {
                           vscode.window.showErrorMessage(
                             "Created a new issue for " + field
                           );
@@ -422,7 +434,7 @@ function activate(context) {
                         );
                         if (
                           issue.body ===
-                            "No details could be automatically pulled" &&
+                          "No details could be automatically pulled" &&
                           definition !== undefined
                         ) {
                           gh.editIssue(issue.number, {
@@ -436,8 +448,8 @@ function activate(context) {
                         } else {
                           vscode.window.showErrorMessage(
                             "Issue already exists for " +
-                              field +
-                              " please bug Michael to add it"
+                            field +
+                            " please bug Michael to add it"
                           );
                         }
                       }
@@ -496,9 +508,7 @@ function activate(context) {
             // and fields...
             if (parsedJson.structure[i][i2].fields) {
               for (
-                let i3 = 0;
-                i3 < parsedJson.structure[i][i2].fields.length;
-                i3++
+                let i3 = 0; i3 < parsedJson.structure[i][i2].fields.length; i3++
               ) {
                 let fieldExists = false;
                 let duplicate = false;
@@ -537,7 +547,9 @@ function activate(context) {
                       let field = parsedJson.structure[i][i2].fields[i3];
                       if (newIssues.indexOf(field) === -1) {
                         newIssues.push(field);
-                        gh.listIssues().then(function({ data }) {
+                        gh.listIssues().then(function ({
+                          data
+                        }) {
                           let issueAlreadyExists = false;
                           for (let index in data) {
                             var issue = data[index];
@@ -551,7 +563,7 @@ function activate(context) {
                               title: field,
                               body: "No details could be automatically pulled",
                               labels: ["new SimpleNexus field"]
-                            }).then(function() {
+                            }).then(function () {
                               vscode.window.showErrorMessage(
                                 "Created a new issue for " + field
                               );
@@ -567,7 +579,7 @@ function activate(context) {
                             );
                             if (
                               issue.body ===
-                                "No details could be automatically pulled" &&
+                              "No details could be automatically pulled" &&
                               definition !== undefined
                             ) {
                               gh.editIssue(issue.number, {
@@ -578,8 +590,8 @@ function activate(context) {
                             } else {
                               vscode.window.showErrorMessage(
                                 "Issue already exists for " +
-                                  field +
-                                  " please bug Michael to add it"
+                                field +
+                                " please bug Michael to add it"
                               );
                             }
                           }
@@ -589,8 +601,8 @@ function activate(context) {
                   } else {
                     vscode.window.showWarningMessage(
                       "Field '" +
-                        parsedJson.structure[i][i2].fields[i3] +
-                        "' exists in structure, but not in fields"
+                      parsedJson.structure[i][i2].fields[i3] +
+                      "' exists in structure, but not in fields"
                     );
                   }
                 } else {
@@ -617,7 +629,9 @@ function activate(context) {
                     );
                     if (newIssues.indexOf(field) === -1) {
                       newIssues.push(field);
-                      gh.listIssues().then(function({ data }) {
+                      gh.listIssues().then(function ({
+                        data
+                      }) {
                         let issueAlreadyExists = false;
                         for (let index in data) {
                           var issue = data[index];
@@ -631,7 +645,7 @@ function activate(context) {
                             title: field,
                             body: "```json\n" + definition + "\n```",
                             labels: ["new SimpleNexus field"]
-                          }).then(function() {
+                          }).then(function () {
                             vscode.window.showErrorMessage(
                               "Created a new issue for " + field
                             );
@@ -647,7 +661,7 @@ function activate(context) {
                           );
                           if (
                             issue.body ===
-                              "No details could be automatically pulled" &&
+                            "No details could be automatically pulled" &&
                             definition !== undefined
                           ) {
                             gh.editIssue(issue.number, {
@@ -661,8 +675,8 @@ function activate(context) {
                           } else {
                             vscode.window.showErrorMessage(
                               "Issue already exists for " +
-                                field +
-                                " please bug Michael to add it"
+                              field +
+                              " please bug Michael to add it"
                             );
                           }
                         }
@@ -737,8 +751,8 @@ function activate(context) {
               if (field == page.condition) {
                 vscode.window.showErrorMessage(
                   "Page with instructions '" +
-                    page.instructions +
-                    "' has a field that is the same as the condition!"
+                  page.instructions +
+                  "' has a field that is the same as the condition!"
                 );
                 has_errors = true;
               }
@@ -756,8 +770,8 @@ function activate(context) {
                 if (field == page.condition) {
                   vscode.window.showErrorMessage(
                     "Page with instructions '" +
-                      page.instructions +
-                      "' has a field that is the same as the condition!"
+                    page.instructions +
+                    "' has a field that is the same as the condition!"
                   );
                   has_errors = true;
                 }
@@ -785,8 +799,8 @@ function activate(context) {
           if (currentField.choices === undefined) {
             vscode.window.showErrorMessage(
               "Field '" +
-                currentField.key +
-                "' is of single choice type but has no choices!"
+              currentField.key +
+              "' is of single choice type but has no choices!"
             );
             has_errors = true;
           }
@@ -798,8 +812,8 @@ function activate(context) {
           if (currentField.choices === undefined) {
             vscode.window.showErrorMessage(
               "Field '" +
-                currentField.key +
-                "' is of multi choice type but has no choices!"
+              currentField.key +
+              "' is of multi choice type but has no choices!"
             );
             has_errors = true;
           }
@@ -859,8 +873,8 @@ function activate(context) {
             ) {
               vscode.window.showWarningMessage(
                 "Field '" +
-                  currentField.key +
-                  "' is subject property state, but allows all states!"
+                currentField.key +
+                "' is subject property state, but allows all states!"
               );
             }
             // all state fields except property state should allow all states
@@ -872,8 +886,8 @@ function activate(context) {
             ) {
               vscode.window.showWarningMessage(
                 "Field '" +
-                  currentField.key +
-                  "' is of state type but does not allow all states!"
+                currentField.key +
+                "' is of state type but does not allow all states!"
               );
             }
           }
@@ -919,18 +933,18 @@ function activate(context) {
 
       if (
         parsedJson.fields.length -
-          cleanedJson.fields.length -
-          partialDuplicateFields.length -
-          unusedFields.length >
+        cleanedJson.fields.length -
+        partialDuplicateFields.length -
+        unusedFields.length >
         0
       ) {
         vscode.window.showInformationMessage(
           "Removed " +
-            (parsedJson.fields.length -
-              cleanedJson.fields.length -
-              partialDuplicateFields.length -
-              unusedFields.length) +
-            " duplicate field(s)"
+          (parsedJson.fields.length -
+            cleanedJson.fields.length -
+            partialDuplicateFields.length -
+            unusedFields.length) +
+          " duplicate field(s)"
         );
       }
       if (nmmAddedFields > 0) {
@@ -1045,10 +1059,10 @@ function activate(context) {
                 if (organizedField[key] == undefined) {
                   console.log(
                     "Is " +
-                      key +
-                      " a valid entry for a " +
-                      organizedField.type +
-                      " type?"
+                    key +
+                    " a valid entry for a " +
+                    organizedField.type +
+                    " type?"
                   );
                 }
               }
