@@ -577,6 +577,8 @@
         "party_to_lawsuit",
         "party_to_lawsuit_explanation",
         "pension/retirement_income",
+        "preferred_contact_method",
+        "preferred_contact_method_with_coborrower",
         "present_lot_value",
         "present_market_value_1",
         "present_market_value_2",
@@ -1974,7 +1976,7 @@
       "choices": [
         "Male",
         "Female",
-        "Information not provided"
+        "I do not wish to provide this information"
       ],
       "required": false
     },
@@ -7461,7 +7463,7 @@
       "choices": [
         "Male",
         "Female",
-        "Information not provided"
+        "I do not wish to provide this information"
       ],
       "required": false
     },
@@ -8462,6 +8464,38 @@
       "key": "pension/retirement_income",
       "title": "How much do you receive in monthly pension and/or retirement income?",
       "type": "currency",
+      "required": false
+    },
+    {
+      "key": "preferred_contact_method",
+      "title": "Preferred Contact Method",
+      "type": "single_choice",
+      "choices": [
+        "",
+        "Borrower Cell",
+        "Borrower Home",
+        "Borrower Work",
+        "Borrower Email",
+        "No preference"
+      ],
+      "required": false
+    },
+    {
+      "key": "preferred_contact_method_with_coborrower",
+      "title": "Preferred Contact Method",
+      "type": "single_choice",
+      "choices": [
+        "",
+        "Borrower Cell",
+        "Borrower Home",
+        "Borrower Work",
+        "Borrower Email",
+        "CoBorrower Cell",
+        "CoBorrower Home",
+        "CoBorrower Work",
+        "CoBorrower Email",
+        "No preference"
+      ],
       "required": false
     },
     {

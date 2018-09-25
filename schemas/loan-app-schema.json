@@ -22,7 +22,7 @@
           "title": "Fields",
           "description": "A list of input field keys. Each key is further defined under the \"fields\" root property",
           "items": {
-            "$ref": "./placeholders.json#/definitions/placeholders"
+            "$ref": "placeholders.json#/definitions/placeholders"
           },
           "minItems": 1
         },
@@ -34,7 +34,7 @@
         "condition": {
           "title": "Condition",
           "description": "The key of a previous field which controls whether this section renders",
-          "$ref": "./placeholders.json#/definitions/placeholders"
+          "$ref": "placeholders.json#/definitions/placeholders"
         },
         "conditionValue": {
           "type": "string",
@@ -87,22 +87,22 @@
                   "address": {
                     "title": "",
                     "description": "",
-                    "$ref": "./placeholders.json#/definitions/placeholders"
+                    "$ref": "placeholders.json#/definitions/placeholders"
                   },
                   "city": {
                     "title": "",
                     "description": "",
-                    "$ref": "./placeholders.json#/definitions/placeholders"
+                    "$ref": "placeholders.json#/definitions/placeholders"
                   },
                   "state": {
                     "title": "",
                     "description": "",
-                    "$ref": "./placeholders.json#/definitions/placeholders"
+                    "$ref": "placeholders.json#/definitions/placeholders"
                   },
                   "zip": {
                     "title": "",
                     "description": "",
-                    "$ref": "./placeholders.json#/definitions/placeholders"
+                    "$ref": "placeholders.json#/definitions/placeholders"
                   }
                 }
               }
@@ -151,7 +151,7 @@
       "description": "Describes the type of input field and any special conditions it may have",
       "properties": {
         "key": {
-          "$ref": "./placeholders.json#/definitions/placeholders"
+          "$ref": "placeholders.json#/definitions/placeholders"
         },
         "title": {
           "type": "string",

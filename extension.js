@@ -22,8 +22,7 @@ function activate(context) {
   // })
   vscode.commands.executeCommand('workbench.action.terminal.splitInActiveWorkspace')
   vscode.languages.registerHoverProvider({
-    language: "json",
-    pattern: "**/SimpleNexusForms/1003/*.json"
+    language: "json"
   }, {
     provideHover(document, position, token) {
       // shows how to make use of fancy markdown with commands
@@ -53,7 +52,6 @@ function activate(context) {
   });
   vscode.languages.registerDefinitionProvider({
     language: "json",
-    pattern: "**/SimpleNexusForms/1003/*.json"
   }, {
     provideDefinition(document, position, token) {
       let field = document.getText(document.getWordRangeAtPosition(position));
@@ -105,15 +103,16 @@ function activate(context) {
   let disposable = vscode.commands.registerCommand(
     "SimpleNexus.beautifyJson",
     function () {
-      let box = vscode.window.createInputBox();
-      box.prompt = "prompt";
-      box.placeholder = "placeholder";
-      box.step = 1;
-      box.title = "title";
-      box.totalSteps = 2;
-      box.value = "this\nis\ra\n\rtest\r\nyo";
+      // Experimental popup box stuff
+      // let box = vscode.window.createInputBox();
+      // box.prompt = "prompt";
+      // box.placeholder = "placeholder";
+      // box.step = 1;
+      // box.title = "title";
+      // box.totalSteps = 2;
+      // box.value = "this\nis\ra\n\rtest\r\nyo";
       // box.buttons = [vscode.QuickInputButtons.Back];
-      box.show();
+      // box.show();
       // vscode.window.showInputBox({
       //   prompt: "Test",
       //   value: "this\ris\na\n\rtest"
