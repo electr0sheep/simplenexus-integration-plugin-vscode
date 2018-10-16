@@ -13,6 +13,78 @@ var gh = new github({
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
+  if (vscode.window.activeTextEditor) {
+    triggerUpdateDecorations();
+  }
+  vscode.workspace.onDidChangeTextDocument(function (event) {
+    if (vscode.window.activeTextEditor) {
+      triggerUpdateDecorations();
+    }
+  }, null, context.subscriptions);
+  vscode.window.onDidChangeActiveTextEditor(function (editor) {
+    if (vscode.window.activeTextEditor) {
+      triggerUpdateDecorations();
+    }
+  }, null, context.subscriptions);
+  var requiredFieldDecorationType = vscode.window.createTextEditorDecorationType({
+    color: 'rgba(255,0,0,1)'
+  })
+  var timeout = null;
+  function triggerUpdateDecorations() {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(updateDecorations, 500);
+  }
+  function updateDecorations() {
+    var activeEditor = vscode.window.activeTextEditor;
+    if (!activeEditor) {
+      return;
+    }
+    var text = activeEditor.document.getText();
+    var json = JSON.parse(activeEditor.document.getText());
+    var listOfRequiredKeys = [];
+    var requiredFields = [];
+    for (let i = 0; i < json.fields.length; i++) {
+      if (json.fields[i].required === true) {
+        listOfRequiredKeys.push(json.fields[i].key);
+      }
+    }
+    for (let i = 0; i < json.structure.length; i++) {
+      if (json.structure[i].fields) {
+        // SINGLE PHASE
+        for (let i2 = 0; i2 < json.structure[i].fields.length; i2++) {
+          if (listOfRequiredKeys.indexOf(json.structure[i].fields[i2]) != -1) {
+            var regExp = new RegExp('"' + json.structure[i].fields[i2] + '"', "g");
+            var match;
+            while (match = regExp.exec(text)) {
+              var startPos = activeEditor.document.positionAt(match.index);
+              var endPos = activeEditor.document.positionAt(match.index + match[0].length);
+              var decoration = { range: new vscode.Range(startPos, endPos) };
+              requiredFields.push(decoration);
+            }
+          }
+        }
+      } else {
+        // MULTI PHASE
+        for (let i2 = 0; i2 < json.structure[i].length; i2++) {
+          for (let i3 = 0; i3 < json.structure[i][i2].fields.length; i3++) {
+            if (listOfRequiredKeys.indexOf(json.structure[i][i2].fields[i3]) != -1) {
+              var regExp = new RegExp('"' + json.structure[i][i2].fields[i3] + '"', "g");
+              var match;
+              while ((match = regExp.exec(text))) {
+                var startPos = activeEditor.document.positionAt(match.index);
+                var endPos = activeEditor.document.positionAt(match.index + match[0].length);
+                var decoration = { range: new vscode.Range(startPos, endPos) };
+                requiredFields.push(decoration);
+              }
+            }
+          }
+        }
+      }
+    }
+    activeEditor.setDecorations(requiredFieldDecorationType, requiredFields);
+  }
   // vscode.commands.getCommands().then(function (data) {
   //   for (let i in data) {
   //     if (data[i].includes('terminal')) {
